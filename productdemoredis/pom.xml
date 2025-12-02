@@ -8,9 +8,9 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <groupId>cn.edu.xmu.javaee</groupId>
-    <artifactId>productdeomredis</artifactId>
+    <artifactId>productdemoredis</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>productdeomredis</name>
+    <name>productdemoredis</name>
     <description>ProductDemo JPA Version with AOP</description>
 
     <dependencies>

@@ -23,7 +23,7 @@
     <modules>
         <module>core</module>
         <module>productdemoaop</module>
-        <module>productdeomredis</module>
+        <module>productdemoredis</module>
     </modules>
 
     <dependencyManagement>

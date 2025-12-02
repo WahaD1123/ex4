@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @CopyFrom({OnSalePo.class})
 @CopyNotNullTo({OnSalePo.class})
-public class OnSale {
+public class OnSale implements Serializable {
     private Long id;
 
     private Long price;

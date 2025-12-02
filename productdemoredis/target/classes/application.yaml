@@ -47,6 +47,10 @@ spring:
           #慢SQL执行时间
           slow-sql-millis: 100
       validation-query: select 1
+  redis:
+    host: OOAD_redis
+    port: 6379
+    password: 20251120
   jackson:
     #JSON的时间数据的时区
     time-zone: GMT+8

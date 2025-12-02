@@ -1,0 +1,97 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: swr.cn-north-4.myhuaweicloud.com/oomall-javaee/mysql:latest
+    networks:
+      - javaee-proxy
+    ports:
+      - target: 3306 # Container port (Traefik web entry point)
+        published: 3306 # Host port exposed on the nodes
+        protocol: tcp
+    volumes:
+      - /root/mysql/sql:/sql:ro
+      - /root/mysql/conf.d:/etc/mysql/conf.d:ro
+      - /root/mysql/log:/var/log/mysql
+      - /root/mysql/data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=JavaEE2025-10-09
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.mysql==yes
+
+  prometheus:
+    image: swr.cn-north-4.myhuaweicloud.com/oomall-javaee/prom/prometheus:latest
+    networks:
+      - javaee-proxy
+    ports:
+      - "9090:9090"
+    volumes:
+      - /root/prometheus:/etc/prometheus:ro
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+  node-exporter:
+    image: swr.cn-north-4.myhuaweicloud.com/oomall-javaee/prom/node-exporter:latest
+    deploy:
+      mode: global
+    ports:
+      - target: 9100
+        published: 9100
+        protocol: tcp
+        mode: host
+    networks:
+      - javaee-proxy
+
+  redis:
+    image: swr.cn-north-4.myhuaweicloud.com/oomall-javaee/redis/redis-stack-server:latest
+    networks:
+      - javaee-proxy
+    ports:
+      - target: 6379 # Container port (Traefik web entry point)
+        published: 6379 # Host port exposed on the nodes
+        protocol: tcp
+    volumes:
+      - /root/redis:/etc/redis:ro
+    environment:
+      - CONFFILE=/etc/redis/redis.conf
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.redis==yes
+
+  productdemoaop:
+    image: swr.cn-north-4.myhuaweicloud.com/oomall-javaee/productdemoaop:0.0.1-SNAPSHOT
+    networks:
+      - javaee-proxy
+    ports:
+      - target: 8080 # Container port (Traefik web entry point)
+        published: 8080 # Host port exposed on the nodes
+        protocol: tcp
+    volumes:
+      - /root/logs:/app/logs
+    deploy:
+      mode: replicated
+      replicas: 1
+    command:
+      - "--spring.datasource.password=123456"
+      - "--server.tomcat.threads.max=300"
+      - "--spring.datasource.druid.max-active=300"
+      - "--spring.datasource.druid.min-idle=100"
+      - "--spring.datasource.druid.initial-size=100"
+      - "--spring.datasource.druid.stat-view-servlet.login-password=123456"
+
+networks:
+  javaee-proxy:
+    driver: overlay
+    attachable: true
+    external: true

@@ -68,7 +68,7 @@ spring:
     database: mysql
 
 server:
-  port: 8080
+  port: 8081
   tomcat:
     threads:
       #最大工作线程数

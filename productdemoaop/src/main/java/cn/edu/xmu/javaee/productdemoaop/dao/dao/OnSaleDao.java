@@ -1,6 +1,7 @@
 //School of Informatics Xiamen University, GPL-3.0 license
 package cn.edu.xmu.javaee.productdemoaop.dao;
 
+import cn.edu.xmu.javaee.core.infrastructure.RedisUtil;
 import cn.edu.xmu.javaee.core.util.CloneFactory;
 import cn.edu.xmu.javaee.productdemoaop.dao.bo.OnSale;
 import cn.edu.xmu.javaee.productdemoaop.mapper.OnSalePoMapper;
@@ -13,7 +14,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +26,7 @@ import java.util.stream.Collectors;
 public class OnSaleDao {
 
     private final OnSalePoMapper onSalePoMapper;
+    private final RedisUtil redisUtil;
 
     /**
      * 获得货品的最近的价格和库存
@@ -31,9 +35,19 @@ public class OnSaleDao {
      */
     public List<OnSale> getLatestOnSale(Long productId) throws DataAccessException {
         LocalDateTime now = LocalDateTime.now();
-        List<OnSalePo> onsalePoList;
-        Pageable pageable = PageRequest.of(0, 100, Sort.by(Sort.Direction.DESC, "endTime"));
-        onsalePoList = onSalePoMapper.findByProductIdEqualsAndBeginTimeBeforeAndEndTimeAfter(productId, now,now, pageable);
-        return onsalePoList.stream().map(po-> CloneFactory.copy(new OnSale(), po)).collect(Collectors.toList());
+        String key = String.format("p_os_%d", productId);
+        List<OnSale> ret = new ArrayList<>();
+        Serializable serializable = redisUtil.get(key);
+
+        if(serializable != null){
+            ret = (List<OnSale>) serializable;
+        }else {
+            List<OnSalePo> onsalePoList;
+            Pageable pageable = PageRequest.of(0, 100, Sort.by(Sort.Direction.DESC, "endTime"));
+            onsalePoList = onSalePoMapper.findByProductIdEqualsAndBeginTimeBeforeAndEndTimeAfter(productId, now, now, pageable);
+            ret = onsalePoList.stream().map(po -> CloneFactory.copy(new OnSale(), po)).collect(Collectors.toList());
+            redisUtil.set(key, (Serializable) ret, -1);
+        }
+        return ret;
     }
 }

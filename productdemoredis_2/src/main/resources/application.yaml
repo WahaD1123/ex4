@@ -48,7 +48,7 @@ spring:
           slow-sql-millis: 100
       validation-query: select 1
   redis:
-    host: OOAD_redis
+    host: 172.31.3.50
     port: 6379
     password: 20251120
   jackson:

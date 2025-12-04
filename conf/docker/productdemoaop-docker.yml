@@ -70,26 +70,49 @@ services:
           - node.labels.redis==yes
 
   productdemoaop:
-    image: swr.cn-north-4.myhuaweicloud.com/oomall-javaee/productdemoaop:0.0.1-SNAPSHOT
-    networks:
-      - javaee-proxy
-    ports:
-      - target: 8080 # Container port (Traefik web entry point)
-        published: 8080 # Host port exposed on the nodes
-        protocol: tcp
-    volumes:
-      - /root/logs:/app/logs
-    deploy:
-      mode: replicated
-      replicas: 1
-    command:
-      - "--spring.datasource.password=123456"
-      - "--server.tomcat.threads.max=300"
-      - "--spring.datasource.druid.max-active=300"
-      - "--spring.datasource.druid.min-idle=100"
-      - "--spring.datasource.druid.initial-size=100"
-      - "--spring.datasource.druid.stat-view-servlet.login-password=123456"
+      image: xmu-javaee/productdemoaop:0.0.1-SNAPSHOT
+      networks:
+        - javaee-proxy
+      ports:
+        - target: 8080 # Container port (Traefik web entry point)
+          published: 8080 # Host port exposed on the nodes
+          protocol: tcp
+      volumes:
+        - /root/logs:/app/logs
+      deploy:
+        mode: replicated
+        replicas: 1
+      command:
+        - "--spring.datasource.password=123456"
+        - "--server.tomcat.threads.max=500"
+        - "--spring.datasource.druid.max-active=300"
+        - "--spring.datasource.druid.min-idle=100"
+        - "--spring.datasource.druid.initial-size=100"
+        - "--spring.datasource.druid.stat-view-servlet.login-password=123456"
 
+  productdemoredis:
+      image: xmu-javaee/productdemoredis_2:0.0.1-SNAPSHOT
+      networks:
+        - javaee-proxy
+      ports:
+        - target: 8082 # Container port (Traefik web entry point)
+          published: 8082 # Host port exposed on the nodes
+          protocol: tcp
+      volumes:
+        - /root/logs:/app/logs
+      deploy:
+        mode: replicated
+        replicas: 1
+      command:
+        - "--spring.redis.host=OOAD_redis"
+        - "--spring.redis.port=6379"
+        - "--spring.redis.password=20251120"
+        - "--spring.datasource.password=123456"
+        - "--server.tomcat.threads.max=500"
+        - "--spring.datasource.druid.max-active=300"
+        - "--spring.datasource.druid.min-idle=100"
+        - "--spring.datasource.druid.initial-size=100"
+        - "--spring.datasource.druid.stat-view-servlet.login-password=123456"
 networks:
   javaee-proxy:
     driver: overlay

@@ -51,6 +51,12 @@ spring:
     host: 172.31.3.50
     port: 6379
     password: 20251120
+    lettuce:
+      pool:
+        max-active: 300
+        max-idle: 100
+        min-idle: 30
+        max-wait: 10000ms
   jackson:
     #JSON的时间数据的时区
     time-zone: GMT+8

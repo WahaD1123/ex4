@@ -48,9 +48,15 @@ spring:
           slow-sql-millis: 100
       validation-query: select 1
   redis:
-    host: OOAD_redis
+    host: 172.31.3.50
     port: 6379
     password: 20251120
+    lettuce:
+      pool:
+        max-active: 300
+        max-idle: 100
+        min-idle: 30
+        max-wait: 10000ms
   jackson:
     #JSON的时间数据的时区
     time-zone: GMT+8
@@ -68,7 +74,7 @@ spring:
     database: mysql
 
 server:
-  port: 8081
+  port: 8082
   tomcat:
     threads:
       #最大工作线程数
